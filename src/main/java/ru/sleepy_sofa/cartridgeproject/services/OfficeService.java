@@ -43,6 +43,4 @@ public class OfficeService {
                 .collect(Collectors.toList());
         officeRepository.deleteAll(offices);
     }
-
-
 }

@@ -22,7 +22,5 @@ public interface QueueRepository extends JpaRepository<Queue, Long> {
            nativeQuery = true)
     List<Queue> findAll();
 
-    Optional<Queue> findByCartridge(Cartridge cartridge);
-
     Optional<Queue> findByCartridgeAndOffice(Cartridge cartridge, Office office);
 }

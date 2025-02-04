@@ -21,7 +21,6 @@ public class Cartridge {
     @JsonIgnore
     private Office office;
 
-
     @JsonIgnore
     @Transient
     private StateMachine<State, Event> stateMachine;

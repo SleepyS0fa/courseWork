@@ -10,7 +10,6 @@ import ru.sleepy_sofa.cartridgeproject.models.Cartridge;
 import ru.sleepy_sofa.cartridgeproject.models.Office;
 import ru.sleepy_sofa.cartridgeproject.repositories.CartridgeRepository;
 import ru.sleepy_sofa.cartridgeproject.repositories.OfficeRepository;
-import ru.sleepy_sofa.cartridgeproject.repositories.StateRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,19 +21,15 @@ public class CartridgeService {
     @Autowired
     private final CartridgeRepository cartridgeRepository;
     @Autowired
-    private final StateRepository stateRepository;
-    @Autowired
     private final OfficeRepository officeRepository;
     @Autowired
     private StateMachineFactory<State, Event> stateMachineFactory;
 
     @Autowired
     public CartridgeService(CartridgeRepository cartridgeRepository,
-                            StateRepository stateRepository,
                             OfficeRepository officeRepository,
                             StateMachineFactory<State, Event> stateMachineFactory) {
         this.cartridgeRepository = cartridgeRepository;
-        this.stateRepository = stateRepository;
         this.officeRepository = officeRepository;
         this.stateMachineFactory = stateMachineFactory;
     }
@@ -79,7 +74,7 @@ public class CartridgeService {
     }
 
     public List<Cartridge> getCartridgeByState(State state) {
-        return stateRepository.findByState(state);
+        return cartridgeRepository.findByState(state);
     }
 
     public List<Cartridge> getCartridgeByState(List<State> state) {
@@ -135,5 +130,4 @@ public class CartridgeService {
     public boolean returnFromRefuel(Long cartridgeId) {
         return triggerEvent(cartridgeId, Event.RETURN);
     }
-
 }
