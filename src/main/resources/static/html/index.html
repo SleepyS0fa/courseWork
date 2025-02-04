@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Картриджи</title>
+    </head>
+    <body>
+
+    <script>
+        async function getHBS() {
+            const response = await fetch("/template");
+            return await response.text();
+        }
+
+        async function getParam(param) {
+            const response = await fetch("/template/" + param);
+            return await response.json();
+        }
+
+        async function renderTemplate() {
+            try {
+                const templateSource = await getHBS();
+                const template = Handlebars.compile(templateSource);
+
+                const data = {
+                    ready_cartridges: await getParam("ready_cartridges").data,
+                    installed_cartridges: await getParam("installed_cartridges").data,
+                    all_offices: await getParam("all_offices").data,
+                    not_installed_cartridges: await getParam("not_installed_cartridges").data,
+                    queue_cartridges: await getParam("queue_cartridges").data,
+                    possible_queue_cartridges: await getParam("possible_queue_cartridges").data,
+                    empty_cartridges: await getParam("empty_cartridges").data,
+                    refuel_cartridges: await getParam("refuel_cartridges").data
+                };
+                const renderedHtml = template(data);
+                document.body.innerHTML = renderedHtml;
+                callback = () => {
+                    console.log("Скрипт загружен");
+                }
+
+                function loadScript(src, callback) {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.onload = () => {
+                        console.log(`Script ${src} loaded`);
+                        callback();
+                    };
+                    script.onerror = () => {
+                        console.error(`Failed to load script ${src}`);
+                        callback();
+                    };
+                    document.getElementById("scripts").appendChild(script);
+                }
+
+                const scripts = [
+                    "/javascripts/jquery.min.js",
+                    "/javascripts/selectize.min.js",
+                    "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js",
+                    "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js",
+                    "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js",
+                    "/javascripts/selectize.js",
+                    "/javascripts/formsRequest.js"
+                ];
+                function loadScriptsSequentially(scripts, index = 0) {
+                    if (index >= scripts.length) {
+                        console.log("All scripts loaded");
+                        return;
+                    }
+                    loadScript(scripts[index], () => {
+                        setTimeout(() => {
+                            loadScriptsSequentially(scripts, index + 1);
+                        }, 50);
+                    });
+                }
+
+                loadScriptsSequentially(scripts);
+
+
+            } catch (error) {
+                console.error("Ошибка при загрузке шаблона или данных:", error);
+            }
+        }
+
+        window.onload = renderTemplate;
+    </script>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+</html>

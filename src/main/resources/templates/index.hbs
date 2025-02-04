@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <title>Картриджи</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="/stylesheets/selectize.bootstrap5.css">
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    </head>
+    <body>
+        <link rel="stylesheet" href="/stylesheets/selectize.bootstrap5.css">
+        <h2 class="mb-3">Картриджи</h2>
+                <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="operations-tab" data-bs-toggle="tab" data-bs-target="#operations" type="button" role="tab" aria-controls="operations" aria-selected="true">Операции</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="queue-tab" data-bs-toggle="tab" data-bs-target="#queue" type="button" role="tab" aria-controls="operations" aria-selected="true">Очередь</a>
+                    </li>
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link" id="statistics-tab" data-bs-toggle="tab" data-bs-target="#statistics" type="button" role="tab" aria-controls="statistics" aria-selected="false">Статистика</a>-->
+<!--                    </li>-->
+                    <li class="nav-item">
+                        <a class="nav-link" id="administation-tab" data-bs-toggle="tab" data-bs-target="#administation" type="button" role="tab" aria-controls="administation" aria-selected="false">Администрирование</a>
+                    </li>
+                </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active p-3" id="operations" role="tabpanel" aria-labelledby="operations-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Установить картридж</h5>
+                        <form unique="1" state="READY" id="installed" action="/cartridges/installed" method="post">
+                            <div class="mb-3">
+                                <label for="install-cartridge">Выберите картридж</label>
+                                <select name="cartridge_id" id="install-cartridge" class="cartridge form-select js-selectize">
+                                    <option value=''></option>
+                                    {{#each ready_cartridges}}
+                                        <option value={{id}}>{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="install-office">Выберите кабинет</label>
+                                <select name="office_id" id="install-office" class="office form-select js-selectize">
+                                    <option value=''></option>
+                                    {{#each all_offices}}
+                                        <option value={{id}}>{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-3">Установить</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Снять картридж</h5>
+                        <form state="INSTALLED" id="deinstalled" action="/cartridges/deinstalled" method="POST">
+                            <div class="mb-3">
+                                <label for="remote-cartridge">Выберите картридж</label>
+                                <select name="cartridge_id"  id="remote-cartridge" class="cartridge form-select js-selectize">
+                                    <option value=''></option>
+                                    {{#each installed_cartridges}}
+                                        <option value={{id}}>{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div> <!-- при выборе кабинета изменять выбор картриджей -->
+                            <div class="mb-3">
+                                <label for="remote-office">Выберите кабинет</label>
+                                <select name="office_id" id="remote-office" class="office form-select js-selectize">
+                                    <option value=''></option>
+                                    {{#each all_offices}}
+                                        <option value={{id}}>{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Снять</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Отправить на заправку</h5>
+                        <form state="EMPTY" id="sendToRefuel" action="/cartridges/sendToRefuel" method="post">
+                            <div class="mb-3">
+                                <label for="refuel-cartirdge">Выберите картридж</label>
+                                <select name="cartridge_id"  id="refuel-cartirdge" class="cartridge form-select js-selectize" multiple>
+                                    <option value=''></option>
+                                    {{#each empty_cartridges}}
+                                        <option value={{id}}>{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-3">Отправить</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <form state="REFUELING" id="returnFromRefuel" action="/cartridges/returnFromRefuel">
+                            <h5 class="mb-3">Вернулось с заправки</h5>
+                            <div class="mb-3">
+                                <label for="remove-cartirdge">Выберите картридж</label>
+                                <select name="cartridge_id"  id="remove-cartirdge" class="cartridge form-select js-selectize" multiple>
+                                    <option value=''></option>
+                                    {{#each refuel_cartridges}}
+                                        <option value={{id}}>{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-3">Вернуть</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <form state="INSTALLED,EMPTY,REFUELING" id="addToQueue" action="/queue/add" method="post">
+                        <h5 class="mb-3">Добавить в очередь</h5>
+                        <div class="mb-3">
+                            <label for="queue-cartridge">Выберите картридж</label>
+                            <select name="cartridge_id" id="queue-cartridge" class="cartridge form-select js-selectize">
+                                <option value=''></option>
+                                {{#each possible_queue_cartridges}}
+                                    <option value={{id}}>{{name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="queue-office">Выберите кабинет</label>
+                            <select name="office_id" id="queue-office" class="office form-select js-selectize">
+                                <option value=''></option>
+                                {{#each all_offices}}
+                                    <option value={{id}}>{{name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-3">Добавить</button>
+                    </form>
+                </div>
+            </div>
+            <div class="tab-pane fade p-3" id="queue" role="tabpanel" aria-labelledby="statistics-tab">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="text-center" scope="col">Картридж</th>
+                            <th class="text-center" scope="col">Кабинет</th>
+                            <th class="text-center" scope="col">#</th>
+                            <th class="text-center" scope="col"></th>
+                        </tr>
+                    </thead>
+                {{#if queue_cartridges}}
+                    <tbody>
+                        {{#each queue_cartridges}}
+                            <tr>
+                                <th class="text-center" scope="row"><span>{{cartridgeName}}</span></th>
+                                <th class="text-center" scope="row"><span>{{officeName}}</span></th>
+                                <th class="text-center" scope="row">
+                                    <form class="deleteIntoQueue" action="/queue/delete" method="post">
+                                        <input type="hidden" name="cartridge_id" value="{{cartridgeId}}">
+                                        <input type="hidden" name="office_id" value="{{officeId}}">
+                                        <button type="submit" class="btn btn-primary">Установлено</button>
+                                    </form>
+                                </th>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                {{/if}}
+                </table>
+
+            </div>
+            <div class="tab-pane fade p-3" id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
+            </div>
+            <div class="tab-pane fade p-3" id="administation" role="tabpanel" aria-labelledby="administation-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form id="addCartridge" action="/cartridges" method="POST">
+                            <h5 class="mb-3">Добавить картриджи</h5>
+                            <div class="mb-3">
+                                <select name="name" class="add cartridge" multiple required>
+                                    <option value=''></option>
+                                    {{#each all_cartridges}}
+                                        <option name="{{name}}" value="{{name}}">{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-3">Добавить</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <form state="READY,EMPTY" id="deleteCartridge" action="/cartridges/delete" method="post">
+                            <h5 class="mb-3">Списать картридж</h5>
+                            <div class="mb-3">
+                                <select name="name" class="cartridge js-selectize" multiple>
+                                    <option value=''></option>
+                                    {{#each not_installed_cartridges}}
+                                        <option value={{id}}>{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-danger mb-3">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <form id="addOffice" action="/offices" method="POST">
+                            <h5 class="mb-3">Добавить кабинет</h5>
+                            <div class="mb-3">
+                                <select name="name" class="office add" multiple required>
+                                    <option value=''></option>
+                                    {{#each all_offices}}
+                                        <option name="{{name}}" value="{{name}}">{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-3">Добавить</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <form id="deleteOffice" action="/offices/delete" method="post">
+                            <h5 class="mb-3">Удалить кабинет</h5>
+                            <div class="mb-3">
+                                <select name="name" class="office js-selectize" multiple required>
+                                    <option value=''></option>
+                                    {{#each all_offices}}
+                                        <option value={{id}}>{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-danger mb-3">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="toast" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 100000;" >
+
+        </div>
+        <div id="scripts">
+
+        </div>
+    </body>
+</html>
